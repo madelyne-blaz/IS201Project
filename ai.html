@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Date Night Generator 💕</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      color: #222;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      margin: 8px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #ff6f91;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: #ff4f7a;
+    }
+
+    .line {
+      margin: 8px 0;
+      text-align: left;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .loadingText {
+      font-size: 18px;
+      margin-top: 10px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>💕 Date Night Generator</h1>
+
+<!-- START -->
+<div id="startScreen" class="card">
+  <h2>Ready for a fun date idea?</h2>
+  <button onclick="showSetup()">Start</button>
+</div>
+
+<!-- SETUP -->
+<div id="setupScreen" class="card hidden">
+
+  <div id="step1">
+    <h3>Step 1: Vibe 🌿</h3>
+    <button onclick="setSetting('outdoor'); nextStep(1)">🌳 Outdoor</button>
+    <button onclick="setSetting('inside'); nextStep(1)">🏠 Indoor</button>
+    <button onclick="setSetting('surprise'); nextStep(1)">🎲 Surprise</button>
+  </div>
+
+  <div id="step2" class="hidden">
+    <h3>Step 2: Type 🎯</h3>
+    <button onclick="setType('food'); nextStep(2)">🍔 Food</button>
+    <button onclick="setType('activity'); nextStep(2)">🎯 Activity</button>
+    <button onclick="setType('both'); nextStep(2)">🎉 Both</button>
+    <button onclick="setType('wild'); nextStep(2)">🤯 Unhinged</button>
+  </div>
+
+  <div id="step3" class="hidden">
+    <h3>Step 3: Group 💕</h3>
+    <button onclick="setDateGroup('solo'); startLoading()">One-on-One</button>
+    <button onclick="setDateGroup('double'); startLoading()">Double Date</button>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div id="loadingScreen" class="card hidden">
+  <h2>✨ Generating your date idea...</h2>
+  <div class="loadingText" id="loadingQuote"></div>
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen" class="card hidden">
+  <h2>💡 Your Date Idea</h2>
+  <div id="results"></div>
+  <br>
+  <button onclick="startLoading()">Generate Again</button>
+  <button onclick="resetAll()">Back to Start</button>
+</div>
+
+<script>
+
+let setting = "";
+let type = "";
+let dateGroup = "solo";
+
+function showSetup() {
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("setupScreen").classList.remove("hidden");
+}
+
+function nextStep(step) {
+  document.getElementById("step" + step).classList.add("hidden");
+  document.getElementById("step" + (step + 1)).classList.remove("hidden");
+}
+
+function setSetting(v) { setting = v; }
+function setType(v) { type = v; }
+function setDateGroup(v) { dateGroup = v; }
+
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* LOADING TEXT */
+const loadingQuotes = [
+  "Mixing chaos and romance...",
+  "Consulting questionable love algorithms...",
+  "Spinning the romance wheel...",
+  "Building your perfect night...",
+  "Generating something slightly unhinged..."
+];
+
+/* START LOADING */
+function startLoading() {
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("loadingScreen").classList.remove("hidden");
+
+  document.getElementById("loadingQuote").innerText =
+    randomFrom(loadingQuotes);
+
+  setTimeout(generateIdea, 1200);
+}
+
+/* IDEAS (UPDATED + MORE DESCRIPTIVE) */
+const ideas = {
+
+  food: [
+    {
+      title: "Budget Grocery MasterChef",
+      action: "Go to a grocery store and create a full dinner together for under $15",
+      rules: "Spend time separately picking ingredients for each other without showing. Then combine everything into one shared meal.",
+      chaos: "Present your dish like you're on a dramatic cooking competition finale."
+    },
+    {
+      title: "Gas Station Gourmet Challenge",
+      action: "Go to a gas station or convenience store and build a full meal",
+      rules: "Each person picks a drink, main item, and dessert without coordination.",
+      chaos: "Rate everything like elite food critics with extreme seriousness."
+    },
+    {
+      title: "Blind Snack Taste Test",
+      action: "Buy 5–7 random snacks from a store and set up a blind taste test",
+      rules: "Take turns blindfolding and guessing each item after tasting.",
+      chaos: "Wrong guesses must be apologized to dramatically."
+    },
+    {
+      title: "Color-Themed Food Night",
+      action: "Pick one color and find foods that match it",
+      rules: "Only eat foods matching that color for the entire date.",
+      chaos: "You must act like your personality has become that color."
+    },
+    {
+      title: "Fancy Plating Challenge",
+      action: "Make a simple meal at home using whatever you already have",
+      rules: "Plate it like a luxury restaurant dish and set a timer for presentation.",
+      chaos: "Take influencer-style food photos before eating."
+    }
+  ],
+
+  activity: [
+    {
+      title: "Emotion Playlist Walk",
+      action: "Walk around your neighborhood for 30–45 minutes",
+      rules: "Build a shared playlist where every song matches something you see or feel.",
+      chaos: "Music must change genre whenever something unexpected happens."
+    },
+    {
+      title: "Thrift Store Outfit Battle",
+      action: "Go thrift shopping for 45–60 minutes",
+      rules: "Each person secretly picks an outfit for the other to wear and model.",
+      chaos: "Do a full runway walk with dramatic commentary."
+    },
+    {
+      title: "Photo Story Adventure",
+      action: "Walk around and take 10–15 random photos together",
+      rules: "Each photo must represent a different emotion or imaginary story.",
+      chaos: "No deleting awkward or bad photos allowed."
+    },
+    {
+      title: "NPC Mode Walk",
+      action: "Walk through a public place like a park or store",
+      rules: "Act like video game NPCs with repetitive dialogue or behavior.",
+      chaos: "You cannot break character no matter what happens."
+    },
+    {
+      title: "Sticker Mission Game",
+      action: "Buy stickers and walk around a small area",
+      rules: "Secretly hide stickers for each other to find throughout the date.",
+      chaos: "Each sticker triggers a random silly dare."
+    }
+  ],
+
+  both: [
+    {
+      title: "Silent Critic Café Date",
+      action: "Go to a café or casual restaurant",
+      rules: "Communicate only through writing while rating everything out of 10.",
+      chaos: "All notes must sound like dramatic movie reviews."
+    },
+    {
+      title: "Mini Adventure Bingo",
+      action: "Create a 5–9 square bingo of cheap activities",
+      rules: "Try to complete as many squares as possible in 1–2 hours.",
+      chaos: "Bingo win requires a public celebration."
+    },
+    {
+      title: "Receipt Story Game",
+      action: "Find or create receipts and sit together",
+      rules: "Create a detailed story for every item listed.",
+      chaos: "Stories must escalate into absurd drama."
+    },
+    {
+      title: "Compliment Roast Game",
+      action: "Sit and talk for 15–30 minutes",
+      rules: "Every compliment must be followed by a playful roast.",
+      chaos: "Keep score of funniest roast."
+    },
+    {
+      title: "Mystery Walk Challenge",
+      action: "Start walking with no destination",
+      rules: "Every decision is made randomly (coin, number, etc.).",
+      chaos: "Narrate everything like an adventure documentary."
+    }
+  ],
+
+  wild: [
+    {
+      title: "Coin-Controlled Reality Night",
+      action: "Explore your area with no plan",
+      rules: "Flip a coin every 5 minutes to decide everything.",
+      chaos: "Disagreeing with coin = immediate dare."
+    },
+    {
+      title: "NPC Mode Challenge",
+      action: "Walk through public spaces",
+      rules: "Stay in character as background NPCs.",
+      chaos: "No breaking character allowed."
+    },
+    {
+      title: "Rule Generator Night",
+      action: "Write 5–7 random rules before starting",
+      rules: "Follow all rules for 1–2 hours strictly.",
+      chaos: "Breaking rules triggers punishment."
+    },
+    {
+      title: "Chaos Navigation Game",
+      action: "Walk randomly without planning",
+      rules: "All directions are chosen randomly.",
+      chaos: "Celebrate getting lost."
+    },
+    {
+      title: "Stranger Tourist Mode",
+      action: "Explore your own town like tourists",
+      rules: "Act like everything is new and unfamiliar.",
+      chaos: "Speak in documentary narration voice."
+    }
+  ]
+
+};
+
+/* FALLBACK */
+const fallback = [
+  {
+    title: "Random Adventure Mode",
+    action: "Start walking with no plan",
+    rules: "Every decision is spontaneous",
+    chaos: "No planning allowed at all"
+  }
+];
+
+/* GENERATE */
+function generateIdea() {
+
+  const pool = setting === "surprise"
+    ? Object.values(ideas).flat()
+    : (ideas[type] || fallback);
+
+  const idea = randomFrom(pool);
+
+  document.getElementById("loadingScreen").classList.add("hidden");
+
+  document.getElementById("results").innerHTML = `
+    <div class="title">✨ ${idea.title}</div>
+    <div class="line">📍 ${idea.action}</div>
+    <div class="line">🎯 ${idea.rules}</div>
+    <div class="line">🤯 ${idea.chaos}</div>
+  `;
+
+  document.getElementById("resultScreen").classList.remove("hidden");
+}
+
+/* RESET */
+function resetAll() {
+
+  setting = "";
+  type = "";
+  dateGroup = "solo";
+
+  document.getElementById("step1").classList.remove("hidden");
+  document.getElementById("step2").classList.add("hidden");
+  document.getElementById("step3").classList.add("hidden");
+
+  document.getElementById("loadingScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("startScreen").classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
